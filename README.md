@@ -1,8 +1,8 @@
 # cgps
 
-###############
+
 # preparation #
-###############
+
 install R package:
 * Biobase
 * limma
@@ -26,9 +26,7 @@ Data format
 Please refer to 'test' directory
 the test data is microarray 
 
-################
 #     steps    #
-################
 Rscript combined_methods.R expfile phefile datatype=[ma/rseq] datadir
 python predict.py datadir outdir
 
