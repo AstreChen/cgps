@@ -102,7 +102,6 @@ def run_svm_18dims(datadir,gmtf,outdir,svmfile='./data/cgps_model.pkl'):
 if __name__ == '__main__':
     if len(sys.argv) != 3:
         print "python "+ sys.argv[0] + "datadir  outdir "
-
     datadir = sys.argv[1]
     #save all 9 methods results
     gmtf = './data/kegg.pathway.hsa.320.gmt'
