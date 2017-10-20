@@ -80,7 +80,7 @@ norm.exp <- function(expdata,pdata,dtype){
 
 norm.de.exp <- function(exset, datatype){
     if (datatype=='ma'){
-        exset <- limma::normalizeBetweenArrays(expdata, method="quantile")
+        exprs(exset) <- limma::normalizeBetweenArrays(expdata, method="quantile")
         exset <- de.ana(exset, de.method="limma")  ### only saved in fData, but not change EXPRESSION DATA
     }
     else if (datatype=='rseq') {
@@ -94,8 +94,8 @@ norm.de.exp <- function(exset, datatype){
         else{
             exprs(exset) <- log2(exprs(exset) + 3.0)
         }
+        exprs(exset) <- limma::normalizeBetweenArrays(expdata, method="quantile")
         exset <- de.ana(exset,de.method="limma")
-
     }
     else {
         stop('none acceptable data type.')
