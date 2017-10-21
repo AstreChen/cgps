@@ -6,25 +6,37 @@ library(edgeR)
 
 ######
 args <- commandArgs(TRUE)
-if (length(args) != 4){
-  stop("Rscript combined_methods.R expfile phefile datatype=[ma/rseq] output_directory \n")
+if (length(args) != 6){
+  stop("Rscript combined_methods.R cgpshome expfile phefile datatype=[ma/rseq] species output_directory \n")
 }
-expf <- args[1]
-phef <- args[2]
-dtype <- args[3]  # read count
-#spe <- args[4]
-outdir <- args[4]
-spe <- 'hsa'
+cgpshome <- args[1]
+expf <- args[2]
+phef <- args[3]
+dtype <- args[4]  # read count
+spe <- args[5]
+outdir <- args[6]
+
+setwd(cgpshome)
 
 ########################
 ### source the codes ###
 ########################
 
-source('./individual_methods.R')
+source('./src/individual_methods.R')
 
-rs <- get.gs.grn.from.kegg(spe)
-gene.sets <- rs$gsl
-grn <- rs$grn
+gmtf <- paste0('data/kegg.',spe,'.gmt')
+grnf <- paste0('data/kegg.',spe,'.grn.tsv')
+if (file.exists(gmtf) & file.exists(grnf)){
+  read.gs.from.file(gmtf)
+  read.grn.from.file(grnf)
+} else{
+  rs <- get.gs.grn.from.kegg(spe)
+  gene.sets <- rs$gsl
+  grn <- rs$grn
+  write.gmt(gene.sets, gmtf)
+  write.grn(grn, grnf)
+}
+
 
 expdata <- read.exp(expf)  # return matrix
 pdata <- read.phe(phef) # return AnnotateDF
