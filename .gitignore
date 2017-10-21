@@ -1,2 +1,3 @@
 *pyc
-test/res/*
+test*
+data*
