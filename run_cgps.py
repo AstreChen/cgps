@@ -14,7 +14,7 @@ def get_dir():
     return cgps_home
 
 def config_option():
-    usage = 'Usage: main.py -e expfile -p phefile -d datatype -s species -o outdir'
+    usage = 'Usage: run_cgps.py -e expfile -p phefile -d datatype -s species -o outdir'
     p = OptionParser(usage)
     p.add_option(
         '-e','--expfile',dest='expfile',action='store',
@@ -44,7 +44,7 @@ if len(sys.argv) == 1:
     opt_parser.print_help()
     sys.exit(1)
 
-cmdline = 'Rscript combined_methods.R '+ ' '.join([cgps_home,opt.expfile, opt.phefile, opt.datatype, opt.species, opt.outdir])
+cmdline = 'Rscript '+cgps_home+'/scripts/combined_methods.R '+ ' '.join([cgps_home,opt.expfile, opt.phefile, opt.datatype, opt.species, opt.outdir])
 
 subprocess.Popen(cmdline)
 
