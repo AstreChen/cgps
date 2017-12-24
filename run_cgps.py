@@ -148,6 +148,7 @@ def run_svm_18dims(datadir,gmtf,outdir,svmfile):
 
     rank_out.columns = ['GENE_SET','NAME','ENRICH_CLASS','R_SCORE','PROBABILITY']
     rank_out = rank_out.sort_values('R_SCORE', ascending=False)
+    rank_out = rank_out.loc[:,['GENE_SET','NAME','R_SCORE']]
     rank_out.to_csv( outdir +'combination_results.tsv',  sep="\t", header=True, index=False)
 
 gmtf = opt.gmtf
