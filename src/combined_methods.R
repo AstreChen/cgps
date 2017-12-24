@@ -6,16 +6,16 @@ library(edgeR)
 
 ######
 args <- commandArgs(TRUE)
-if (length(args) != 6){
-  stop("Rscript combined_methods.R cgpshome expfile phefile datatype=[ma/rseq] species output_directory \n")
-}
+#if (length(args) != 7){
+#  stop("Rscript combined_methods.R cgpshome expfile phefile datatype=[ma/rseq] species output_directory gmtf \n")
+#}
 cgpshome <- args[1]
 expf <- args[2]
 phef <- args[3]
 dtype <- args[4]  # read count
 spe <- args[5]
 outdir <- args[6]
-
+in_gmtf <- args[7]
 setwd(cgpshome)
 
 ########################
@@ -24,11 +24,17 @@ setwd(cgpshome)
 
 source('./src/individual_methods.R')
 
-gmtf <- paste0('data/kegg.',spe,'.gmt')
+if (file.exists(in_gmtf)){ 
+    gmtf <- in_gmtf 
+} else{ 
+    gmtf <- paste0('data/kegg.',spe,'.gmt')
+    stop(paste(gmtf,"is used."),)
+}
+#gmtf <- paste0('data/kegg.',spe,'.gmt')
 grnf <- paste0('data/kegg.',spe,'.grn.tsv')
 if (file.exists(gmtf) & file.exists(grnf)){
-  read.gs.from.file(gmtf)
-  read.grn.from.file(grnf)
+  gene.sets <- read.gs.from.file(gmtf)
+  grn <- read.grn.from.file(grnf)
 } else{
   rs <- get.gs.grn.from.kegg(spe)
   gene.sets <- rs$gsl

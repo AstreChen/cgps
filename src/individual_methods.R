@@ -18,13 +18,14 @@ get.gs.grn.from.kegg <- function(spe){
     gsl <- EnrichmentBrowser::get.kegg.genesets(pwys)
     return (list(gsl=gsl, grn=grn))
 }
-read.gs.from.file <- function(gmtfile){
-  if(file.exists(gmtfile)) stop(paste0(gmtfile," file not exist.","\n"))
-  tb <- read.delim(gmtfile)
-  gsl <- lapply(seq_len(nrow(tb)), FUN=function(x){return (as.character(tb[x,]))})
-  names(gsl) = rownames(tb)
-  return (gsl)
-}
+#read.gs.from.file <- function(gmtfile){
+#  if(! file.exists(gmtfile)) stop(paste0(gmtfile," file not exist.","\n"))
+#  tb <- read.delim(gmtfile)
+#  gsl <- lapply(seq_len(nrow(tb)), FUN=function(x){return (as.character(tb[x,]))})
+#  names(gsl) = rownames(tb)
+#  return (gsl)
+#}
+read.gs.from.file <- EnrichmentBrowser::parse.genesets.from.GMT
   
 # write genesets to file in GMT format
 write.gmt <- function(gs, gmt.file)
@@ -48,7 +49,7 @@ write.gmt <- function(gs, gmt.file)
 }
 read.grn.from.file <- function(grnfile){
     message("Read gene regulatory network\n")
-    if(file.exists(gmtfile)) stop(paste0(gmtfile," file not exist.","\n"))
+    if(! file.exists(grnfile)) stop(paste0(grnfile," file not exist.","\n"))
     grn <- read.delim(grnfile, stringsAsFactors=F)
     grn$FROM <- as.character(grn$FROM)
     grn$TO <- as.character(grn$TO)

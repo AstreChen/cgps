@@ -30,9 +30,11 @@ def config_option():
         help='')
     p.add_option(
         '-o','--outdir',dest='outdir',action='store',
-        help='')
+        help='absolute path')
+    p.add_option('-g','--gmtf',dest='gmtf',action='store',
+                 help='absolute path')
     opt, args = p.parse_args()
-    return p,opt,args 
+    return p,opt,args
 
 #################################
 ##### run individual methods ####
@@ -44,15 +46,15 @@ if len(sys.argv) == 1:
     opt_parser.print_help()
     sys.exit(1)
 
-cmdline = 'Rscript '+cgps_home+'/scripts/combined_methods.R '+ ' '.join([cgps_home,opt.expfile, opt.phefile, opt.datatype, opt.species, opt.outdir])
-
-subprocess.Popen(cmdline)
+cmdline = 'Rscript '+cgps_home+'/scripts/combined_methods.R '+ ' '.join([cgps_home,opt.expfile, opt.phefile, opt.datatype, opt.spe, opt.outdir,opt.gmtf])
+print cmdline
+subprocess.call(cmdline,shell=True)
 
 ################################
 ###### Predict by CGPS #########
 ################################
 
-def read_gmt_file(gmt=gmtf):
+def read_gmt_file(gmt):
     gset_des={}    #description of gene sets
     gset_genes = {}  # genes of gene sets
     gmt_file = open(gmt,'r')
@@ -99,7 +101,7 @@ def run_svm_18dims(datadir,gmtf,outdir,svmfile):
         'gsea',
         'padog',
         'plage',
-        'safe']  
+        'safe']
 
 
     ## read gene sets ###
@@ -125,8 +127,8 @@ def run_svm_18dims(datadir,gmtf,outdir,svmfile):
         else:
             pval = 'P.VALUE'
         tbl[md]['rank'] = (np.arange(tbl[md].shape[0]) + 1.0) / gset_df.shape[0]  ### divide the total of the gene sets invert to rank percent
-        md_rank[md] = pd.DataFrame({'GENE_SET': tbl[md]['GENE.SET'], (md+'_pval'):tbl[md][pval],(md+'_rank'):tbl[md]['rank'] })        
-        rank_tb = rank_tb.merge(md_rank[md], left_on = 'GENE.SET', right_on = 'GENE_SET', how = 'outer')       
+        md_rank[md] = pd.DataFrame({'GENE_SET': tbl[md]['GENE.SET'], (md+'_pval'):tbl[md][pval],(md+'_rank'):tbl[md]['rank'] })
+        rank_tb = rank_tb.merge(md_rank[md], left_on = 'GENE.SET', right_on = 'GENE_SET', how = 'outer')
         rank_tb = rank_tb.drop('GENE_SET',axis=1)
     rank_arr = rank_tb.iloc[:,2:]
     rank_arr = rank_arr.fillna(1.0)
@@ -148,8 +150,9 @@ def run_svm_18dims(datadir,gmtf,outdir,svmfile):
     rank_out = rank_out.sort_values('R_SCORE', ascending=False)
     rank_out.to_csv( outdir +'combination_results.tsv',  sep="\t", header=True, index=False)
 
-gmtf = cgps_home + '/data/kegg.'+opt.spe+'.gmt'
+gmtf = opt.gmtf
+#gmtf = cgps_home + '/data/kegg.'+opt.spe+'.gmt'
 svmfile = cgps_home + '/data/cgps_model.pkl'
-outdir = cgps_home + '/test/res/'
-run_svm_18dims(opt.outdir,gmtf,opt.outdir,svmfile)
+#outdir = cgps_home + '/test/res/'
+run_svm_18dims(opt.outdir+'/',gmtf,opt.outdir+'/',svmfile)
 
