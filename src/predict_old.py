@@ -1,6 +1,5 @@
-import sys, os
-import subprocess
-from optparse import OptionParser
+### test for svm function in run_mulmds.py
+import sys,os 
 import numpy as np
 import pandas as pd
 
@@ -38,7 +37,7 @@ def read_gmt_file(gmt):
     #gmtf = # gmt file
     #svmfile =  # svm file
 
-def run_svm_18dims(datadir,gmtf,outdir,svmfile):
+def run_svm_18dims(datadir,gmtf,outdir,svmfile='./data/cgps_model.pkl'):
     ### read svm model
     from sklearn.externals import joblib
     svc = joblib.load(svmfile)
@@ -51,7 +50,7 @@ def run_svm_18dims(datadir,gmtf,outdir,svmfile):
         'gsea',
         'padog',
         'plage',
-        'safe']
+        'safe']  
 
 
     ## read gene sets ###
@@ -77,8 +76,8 @@ def run_svm_18dims(datadir,gmtf,outdir,svmfile):
         else:
             pval = 'P.VALUE'
         tbl[md]['rank'] = (np.arange(tbl[md].shape[0]) + 1.0) / gset_df.shape[0]  ### divide the total of the gene sets invert to rank percent
-        md_rank[md] = pd.DataFrame({'GENE_SET': tbl[md]['GENE.SET'], (md+'_pval'):tbl[md][pval],(md+'_rank'):tbl[md]['rank'] })
-        rank_tb = rank_tb.merge(md_rank[md], left_on = 'GENE.SET', right_on = 'GENE_SET', how = 'outer')
+        md_rank[md] = pd.DataFrame({'GENE_SET': tbl[md]['GENE.SET'], (md+'_pval'):tbl[md][pval],(md+'_rank'):tbl[md]['rank'] })        
+        rank_tb = rank_tb.merge(md_rank[md], left_on = 'GENE.SET', right_on = 'GENE_SET', how = 'outer')       
         rank_tb = rank_tb.drop('GENE_SET',axis=1)
     rank_arr = rank_tb.iloc[:,2:]
     rank_arr = rank_arr.fillna(1.0)
@@ -88,31 +87,24 @@ def run_svm_18dims(datadir,gmtf,outdir,svmfile):
     comb_prb = svc.predict_proba(rank_arr)   # 2 class, so 2-d array : probability to predict as 0 and 1
     comb_prb = np.max(comb_prb,axis=1)   #  the probability to predict correctly
     comb_dis = svc.decision_function(rank_arr)
-    comb_score = - np.log( 1.0 - comb_prb  )
 
     ### output the results ###
     rank_out = rank_tb.iloc[:,:2]    ### first 2 columns: gene set id, gene set description
-    tmp = pd.DataFrame(np.column_stack([comb_score,comb_dis,comb_cls,comb_prb]))
-    tmp.columns = ['R score','distance','class','prob']  ### 3-5 column: class,distance, probability ,
+    tmp = pd.DataFrame(np.column_stack([comb_dis,comb_cls,comb_prb]))
+    tmp.columns = ['distance','class','prob']  ### 3-5 column: class,distance, probability ,
     rank_out['ENT'] = tmp.loc[:,'class']==1
-    rank_out = pd.concat([rank_out, tmp.loc[:,['R score','distance','prob']]], axis=1, ignore_index=True)
+    rank_out = pd.concat([rank_out, tmp.loc[:,['distance','prob']]], axis=1, ignore_index=True)
 
-    rank_out.columns = ['Gene Set','Name','Enrichment','R score','Distance','Probability']
-    rank_out = rank_out.sort_values(['R score','Distance'], ascending=False)
-    #rank_out = rank_out.loc[:,['GENE_SET','NAME','R_SCORE']]
+    rank_out.columns = ['GENE_SET','NAME','ENRICH_CLASS','R_SCORE','PROBABILITY']
+    rank_out = rank_out.sort_values('R_SCORE', ascending=False)
     rank_out.to_csv( outdir +'combination_results.tsv',  sep="\t", header=True, index=False)
 
-
-
-
 if __name__ == '__main__':
-    if len(sys.argv) != 4:
-        print "python "+ sys.argv[0] + "datadir  outdir  name"
+    if len(sys.argv) != 3:
+        print "python "+ sys.argv[0] + "datadir  outdir "
     datadir = sys.argv[1]
     #save all 9 methods results
     gmtf = './data/kegg.pathway.hsa.320.gmt'
     # gmt file
     outdir = sys.argv[2]
-    name = sys.argv[3]
-    outdir = os.path.join(outdir, name+'_')
     run_svm_18dims(datadir,gmtf,outdir)
