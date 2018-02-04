@@ -98,7 +98,7 @@ def run_svm_18dims(datadir,gmtf,outdir,svmfile):
     rank_out = pd.concat([rank_out, tmp.loc[:,['R score','distance','prob']]], axis=1, ignore_index=True)
 
     rank_out.columns = ['Gene Set','Name','Enrichment','R score','Distance','Probability']
-    rank_out = rank_out.sort_values(['R score','Distance'], ascending=False)
+    rank_out = rank_out.sort_values(['Enrichment','R score','Distance'], ascending=False)
     #rank_out = rank_out.loc[:,['GENE_SET','NAME','R_SCORE']]
     rank_out.to_csv( outdir +'combination_results.tsv',  sep="\t", header=True, index=False)
 
@@ -106,13 +106,17 @@ def run_svm_18dims(datadir,gmtf,outdir,svmfile):
 
 
 if __name__ == '__main__':
-    if len(sys.argv) != 4:
-        print "python "+ sys.argv[0] + "datadir  outdir  name"
-    datadir = sys.argv[1]
-    #save all 9 methods results
-    gmtf = './data/kegg.pathway.hsa.320.gmt'
-    # gmt file
-    outdir = sys.argv[2]
-    name = sys.argv[3]
-    outdir = os.path.join(outdir, name+'_')
-    run_svm_18dims(datadir,gmtf,outdir)
+
+    parser = OptionParser()
+    parser.add_option("-g", "--gmtfile", dest="gmtfile", 
+        help="input the gene set information with GMT format.")
+    parser.add_option("-i", "--input_dir", dest="indir",
+        help="")
+    parser.add_option("-o", "--output_dir", dest="outdir")
+    parser.add_option("-n", "--name", dest="name")
+
+    (opt, args) = parser.parse_args()
+
+    svmfile = '/Users/aichen/icloud/15.cgps_online/171225-scripts/cgps/data/cgps_model.pkl'
+    outdir = os.path.join(opt.outdir, opt.name+'_')
+    run_svm_18dims(datadir=opt.indir, gmtf=opt.gmtfile, outdir=outdir, svmfile=svmfile)
