@@ -43,6 +43,7 @@ def config_option():
 #################################
 
 cgps_home = get_dir()
+sys.path.insert(0, os.path.join(cgps_home, 'src') )
 opt_parser, opt, args = config_option()
 print opt.expfile,opt.phefile,opt.datatype,opt.outdir
 if len(sys.argv) == 1:
@@ -57,7 +58,7 @@ print cmdline
 ###### Predict by CGPS #########
 ################################
 
-
+import predict
 
 gmtf = opt.gmtf
 #gmtf = cgps_home + '/data/kegg.'+opt.spe+'.gmt'
