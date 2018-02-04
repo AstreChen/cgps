@@ -4,8 +4,6 @@ from optparse import OptionParser
 import numpy as np
 import pandas as pd
 
-from src import predict 
-
 def get_dir():
     srcf = os.environ['HOME']+'/.cgpsrc'
     if not os.path.isfile(srcf):
