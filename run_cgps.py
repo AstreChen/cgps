@@ -50,7 +50,7 @@ if len(sys.argv) == 1:
 
 cmdline = 'Rscript '+cgps_home+'/scripts/combined_methods.R '+ ' '.join([cgps_home,opt.expfile, opt.phefile, opt.datatype, opt.spe, opt.outdir,opt.gmtf])
 print cmdline
-#subprocess.call(cmdline,shell=True)
+subprocess.call(cmdline,shell=True)
 
 ################################
 ###### Predict by CGPS #########
@@ -60,7 +60,7 @@ import predict
 
 gmtf = opt.gmtf
 #gmtf = cgps_home + '/data/kegg.'+opt.spe+'.gmt'
-svmfile = os.path.join(cgps_home, '/data/cgps_model.pkl')
+svmfile = cgps_home + '/data/cgps_model.pkl'
 #outdir = cgps_home + '/test/res/'
 predict.run_svm_18dims(opt.outdir+'/',gmtf,opt.outdir+'/',svmfile)
 
