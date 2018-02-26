@@ -86,7 +86,7 @@ def run_svm_18dims(datadir,gmtf,outdir,svmfile):
     #### classify ######
     comb_cls = svc.predict(rank_arr).astype(int)
     comb_prb = svc.predict_proba(rank_arr)   # 2 class, so 2-d array : probability to predict as 0 and 1
-    comb_prb = np.max(comb_prb,axis=1)   #  the probability to predict correctly
+    comb_prb = comb_prb[:,1]   #  the probability to predict correctly
     comb_dis = svc.decision_function(rank_arr)
     comb_score = - np.log( 1.0 - comb_prb  )
 
